@@ -4,14 +4,14 @@
     {
       "parameters": {
         "options": {
-          "systemMessage": "Sos el asistente especializado de Casa Reposo y respondés consultas utilizando el Manual Maestro de Conocimiento de la marca.\n\nINSTRUCCIONES OBLIGATORIAS:\n\n1. Antes de responder cualquier consulta relacionada con Casa Reposo, utilizá la herramienta Pinecone Vector Store para buscar información relevante en el Manual Maestro.\n\n2. Respondé únicamente con información respaldada por los fragmentos recuperados del manual. No inventes datos, políticas, características, precios, beneficios, procedimientos ni afirmaciones que no estén presentes en el conocimiento recuperado.\n\n3. Si la información recuperada no es suficiente para responder con seguridad, indicá claramente:\n“No encuentro esa información en el Manual Maestro de Casa Reposo.”\n\n4. No menciones Pinecone, embeddings, vectores, RAG, herramientas internas, fragmentos recuperados ni detalles técnicos del sistema.\n\n5. Mantené un tono profesional, cálido, claro, elegante y sereno, coherente con la identidad de Casa Reposo.\n\n6. Priorizá respuestas concretas y fáciles de comprender. Podés utilizar listas cuando ayuden a ordenar la información.\n\n7. No utilices conocimientos externos para completar datos faltantes. El Manual Maestro es la única fuente autorizada.\n\n8. Si la consulta es ambigua, solicitá la aclaración necesaria antes de responder.\n\n9. Respondé siempre en español, salvo que el usuario solicite expresamente otro idioma.\n\nTu objetivo es brindar respuestas confiables, consistentes y alineadas con la identidad, los productos, los clientes, las políticas, la comunicación y los procedimientos definidos por Casa Reposo."
+          "systemMessage": "Sos el asistente documental especializado de Casa Reposo. Tu única fuente autorizada es el Manual Maestro de Conocimiento de la marca.\n\nINSTRUCCIONES OBLIGATORIAS:\n\n1. Antes de responder cualquier consulta relacionada con Casa Reposo, utilizá obligatoriamente la herramienta de búsqueda documental conectada para recuperar información relevante del Manual Maestro.\n\n2. Respondé únicamente con información respaldada de manera explícita por los fragmentos recuperados del manual.\n\n3. No inventes, completes, deduzcas ni supongas datos, políticas, precios, características, beneficios, procedimientos o afirmaciones que no estén presentes en el conocimiento recuperado.\n\n4. Si los fragmentos recuperados no contienen información suficiente para responder con seguridad, respondé única y exactamente:\n\nNo sé\n\nEsta regla tiene prioridad absoluta sobre todas las demás instrucciones. Cuando respondas “No sé”, no incluyas fuente, explicación, saludo, disculpa ni ningún otro texto.\n\n5. Cuando la respuesta esté respaldada por el manual, incluí al final una cita utilizando exclusivamente el metadato fileName del documento recuperado.\n\nFormato obligatorio:\n\nFuente: [valor exacto del metadato fileName]\n\n6. Para construir la cita, ignorá valores técnicos o genéricos como blob, binary, mimeType, source, line, lines, locator, index, ID o identificadores internos. Nunca escribas “Fuente: blob”. Si fileName no estuviera disponible, omití completamente la cita en lugar de inventarla.\n\n7. No menciones Pinecone, embeddings, vectores, RAG, herramientas internas, fragmentos recuperados ni detalles técnicos del sistema.\n\n8. No utilices conocimientos externos para completar información faltante. El Manual Maestro es la única fuente autorizada.\n\n9. Si la consulta es ambigua, solicitá únicamente la aclaración necesaria antes de responder.\n\n10. Respondé siempre en español, salvo que el usuario solicite expresamente otro idioma.\n\n11. Mantené un tono profesional, cálido, claro, elegante y sereno, coherente con la identidad de Casa Reposo.\n\n12. Priorizá respuestas concretas y fáciles de comprender. Podés utilizar listas únicamente cuando ayuden a organizar la información.\n\nTu objetivo es brindar respuestas confiables, verificables y alineadas con la identidad, los productos, los clientes, las políticas, la comunicación y los procedimientos definidos en el Manual Maestro de Casa Reposo."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        80,
-        96
+        -352,
+        368
       ],
       "id": "e7ae320c-8b96-4d5b-81c6-ebc8dac8d060",
       "name": "AI Agent"
@@ -21,8 +21,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        144,
-        -96
+        96,
+        368
       ],
       "id": "041dc04a-d08c-407f-9f79-1b7c0e5d7511",
       "name": "Iniciar carga del manual"
@@ -42,8 +42,8 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        336,
-        -96
+        272,
+        368
       ],
       "id": "1fc0ae7b-5d06-4159-a264-255218da0e6e",
       "name": "Descargar manual desde drive",
@@ -63,13 +63,15 @@
           "mode": "list",
           "cachedResultName": "casa-reposo-rag"
         },
-        "options": {}
+        "options": {
+          "pineconeNamespace": "manual-maestro-v2"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
       "typeVersion": 1.3,
       "position": [
-        560,
-        -96
+        448,
+        288
       ],
       "id": "fea8fb27-d8d5-4851-bb55-070cacaed6b4",
       "name": "Guardar fragmentos en pinecone",
@@ -87,8 +89,8 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
       "typeVersion": 1,
       "position": [
-        528,
-        64
+        416,
+        576
       ],
       "id": "df30d0df-e3e5-463e-93f6-7c6ef3ed9fbd",
       "name": "Vectorizar fragmentos con Cohere",
@@ -103,13 +105,22 @@
       "parameters": {
         "dataType": "binary",
         "textSplittingMode": "custom",
-        "options": {}
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "fileName",
+                "value": "Manual_Maestro_Conocimiento_Casa_Reposo_RAG.docx"
+              }
+            ]
+          }
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
       "position": [
-        656,
-        48
+        528,
+        464
       ],
       "id": "1889d2be-9daf-4d9e-9d91-0334339802b2",
       "name": "Cargar documento binario"
@@ -122,8 +133,8 @@
       "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
       "position": [
-        656,
-        208
+        560,
+        656
       ],
       "id": "a01e04e6-13a8-4eb2-a248-c9df1cc77365",
       "name": "Fragmentar manual en chunks"
@@ -135,8 +146,8 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        -80,
-        96
+        -608,
+        368
       ],
       "id": "d9e3e747-d39d-4281-aaa3-a2a9739a1bbe",
       "name": "Recibir consulta del usuario",
@@ -150,8 +161,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        80,
-        288
+        -384,
+        544
       ],
       "id": "6c042f03-5727-4751-995a-c8ec8f4b0f37",
       "name": "Generar respuesta con Gemini",
@@ -172,13 +183,15 @@
           "mode": "list",
           "cachedResultName": "casa-reposo-rag"
         },
-        "options": {}
+        "options": {
+          "pineconeNamespace": "manual-maestro-v2"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
       "typeVersion": 1.3,
       "position": [
-        304,
-        208
+        -256,
+        592
       ],
       "id": "2af5707f-6272-4980-9bbd-e80765827200",
       "name": "Buscar conocimiento en Pinecone",
@@ -196,8 +209,8 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
       "typeVersion": 1,
       "position": [
-        304,
-        352
+        -256,
+        752
       ],
       "id": "7822fe12-9559-4fdc-ba0d-03b6b90de09a",
       "name": "Vectorizar consulta con Cohere",
@@ -317,7 +330,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "d907fd65-625f-4232-9e7d-f72ebaabefc3",
+  "versionId": "30da5bf5-28ed-4613-81e5-55750e70133f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fa7f37844231a6c9b69f64146524744d2ade2969a1e4ff599b326f8cdb9394a8"
